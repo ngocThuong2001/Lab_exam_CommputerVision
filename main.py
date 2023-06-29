@@ -2,24 +2,27 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-trainData = np.random.randint(0,100,(25,2)).astype(np.float32)
-# random màu (1-Đỏ, 2-xanh)
-ketqua = np.random.randint(0, 2, (25, 1)).astype(np.float32)
-red = trainData[ketqua.ravel()==1]
-blue = trainData[ketqua.ravel()==0]
-newMember = np.random.randint(0, 100, (1, 2)).astype(np.float32)
-# vẽ toạ độ
-# toạ độ x, toạ độ y, độ lớn, màu sắc, hiình dạng
-plt.scatter(red[:,0], red[:,1], 100, 'r', 's')
-plt.scatter(blue[:,0], blue[:,1], 100, 'b', '^')
-plt.scatter(newMember[:,0], newMember[:,1], 100, 'g', 'o')
+img = cv2.imread('cat.jpg')
+img = cv2.resize(img, (200, 200))
+img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+print(img_gray.shape)
 
-knn = cv2.ml.KNearest_create()
-knn.train(trainData, 0, ketqua)
-temp, ketqua, hangxom, khoangcach = knn.findNearest(newMember,3)
+def conv2d(input, kernelSize):
+    # kích thước hình
+    height, width = input.shape
+    # tạo kênh số ngẫu nhiên
+    kernel = np.random.randn(kernelSize, kernelSize)
+    print(kernel)
+    # khởi tạo ma trận hứng kết quả
+    results = np.zeros((height-kernelSize+1, width - kernelSize + 1))
 
-print("Result: {}\n".format(ketqua))
-print("Hang Xom: {}\n".format(hangxom))
-print("Khoang Cach: {}\n".format(khoangcach))
+    for row in range(0, height-kernelSize+1):
+        for col in range(0, width - kernelSize + 1):
+            # Diện tích khung hình (3,3) quét
+            results[row, col] = np.sum(input[row: row + kernelSize, col: col + kernelSize] * kernel)
+    return results
 
+
+img_conv2d = conv2d(img_gray, 3)
+plt.imshow(img_conv2d, cmap='gray')
 plt.show()
